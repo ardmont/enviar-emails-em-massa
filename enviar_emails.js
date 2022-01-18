@@ -10,7 +10,6 @@ let results = []
 let writeStream = fs.createWriteStream('emails_enviados.csv')
 writeStream.write('email')
 
-let totalEnviado = 0 
 
 fs.createReadStream('emails.csv')
   .pipe(csv({ separator: ',' }))
@@ -22,13 +21,11 @@ fs.createReadStream('emails.csv')
           await enviarEmail(result.email)
           console.log(`Email enviado para ${result.email}`)
           writeStream.write(`\n${result.email}`)
-          totalEnviado++
         }
       } catch (e) {
         console.log(`Falha ao enviar email: ${e}`)
       }
     })
-    console.log(`Total de emails enviados: ${totalEnviado}`)
   })
   .on('error', (e) => {
     console.log(e)
