@@ -12,7 +12,12 @@ fs.createReadStream('emails.csv')
   .on('data', (data) => results.push(data))
   .on('end', async () => {
     results.forEach(async (result) => {
-      await enviarEmail(result.email)
+      try {
+        await enviarEmail(result.email)
+        console.log(`Email enviado para ${result.email}`)
+      } catch (e) {
+        console.log(`Falha ao enviar email: ${e}`)
+      }
     })
   })
   .on('error', (e) => {
@@ -21,18 +26,10 @@ fs.createReadStream('emails.csv')
 
 async function enviarEmail(email) {
   const mailer = getRandomMailer()
-
-  mailer.sendMail({
+  return mailer.sendMail({
     from: `TESTE <${mailer.options.auth.user}>`,
     to: email,
     subject: 'TESTE',
     html: `TESTE`
-  }).then(() => console.log(`Email enviado para ${email}`))
-    .catch(e => {
-      console.log(`Falha ao enviar email ${e}`)
-      enviarEmail(email)
-    })
+  })
 }
-
-
-
