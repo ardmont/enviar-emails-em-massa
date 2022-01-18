@@ -5,29 +5,39 @@ require('dotenv').config({ path: `.env.${env}` })
 
 const getRandomMailer = require('./get_random_mailer')
 
-//let results = []
+let results = []
+
+let writeStream = fs.createWriteStream('emails_enviados.csv')
+writeStream.write('email')
+
+let totalEnviado = 0 
 
 fs.createReadStream('emails.csv')
   .pipe(csv({ separator: ',' }))
   .on('data', (data) => results.push(data))
   .on('end', async () => {   
-    //let totalEnviado = 0 
     results.forEach(async (result) => {
       try {
         if (result.enviado === 'N') {
           await enviarEmail(result.email)
           console.log(`Email enviado para ${result.email}`)
-          //totalEnviado++
+          writeStream.write(`\n${result.email}`)
+          totalEnviado++
         }
       } catch (e) {
         console.log(`Falha ao enviar email: ${e}`)
       }
     })
-    //console.log(`Total de emails enviados: ${totalEnviado}`)
+    console.log(`Total de emails enviados: ${totalEnviado}`)
   })
   .on('error', (e) => {
     console.log(e)
   })
+
+writeStream.on('finish', () => {
+    console.log('wrote all data to file');
+});
+
 
 async function enviarEmail(email) {
   const mailer = getRandomMailer()
