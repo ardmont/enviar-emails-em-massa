@@ -3,3 +3,4 @@ node_modules
 .env.production
 emails.csv
 emails_enviados.csv
+email_body.html

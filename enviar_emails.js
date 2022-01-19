@@ -36,10 +36,12 @@ writeStream.on('finish', () => {
 
 async function enviarEmail(email) {
   const mailer = getRandomMailer()
+  const email_html = fs.readFileSync(__dirname + "/email_body.html", { encoding:'utf8' }).toString()
+
   return mailer.sendMail({
     from: `${process.env.MAIL_FROM} <${mailer.options.auth.user}>`,
     to: email,
     subject: `${process.env.MAIL_SUBJECT}`,
-    html: `TESTE`
+    html: email_html
   })
 }
