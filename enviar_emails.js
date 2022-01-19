@@ -10,7 +10,6 @@ let results = []
 let writeStream = fs.createWriteStream('emails_enviados.csv')
 writeStream.write('email')
 
-
 fs.createReadStream('emails.csv')
   .pipe(csv({ separator: ',' }))
   .on('data', (data) => results.push(data))
@@ -32,16 +31,15 @@ fs.createReadStream('emails.csv')
   })
 
 writeStream.on('finish', () => {
-    console.log('wrote all data to file');
+  console.log('Emails enviados anotados!');
 });
-
 
 async function enviarEmail(email) {
   const mailer = getRandomMailer()
   return mailer.sendMail({
-    from: `TESTE <${mailer.options.auth.user}>`,
+    from: `${process.env.MAIL_FROM} <${mailer.options.auth.user}>`,
     to: email,
-    subject: 'TESTE',
+    subject: `${process.env.MAIL_SUBJECT}`,
     html: `TESTE`
   })
 }
