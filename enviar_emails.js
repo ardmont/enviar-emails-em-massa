@@ -18,17 +18,18 @@ fs.createReadStream('emails.csv')
   .on('end', async () => {   
     envios = new Promise((resolve, reject) => { 
       results.forEach(async (result, index, array) => {
-        try {
-          if (result.enviado === 'N') {
-            await sleep(2000)
-            await enviarEmail(result.email, mailer)
-            console.log(`Email enviado para ${result.email}`)
-            writeStream.write(`\n${result.email}`)     
+        setTimeout(async () => {
+          try {
+            if (result.enviado === 'N') {
+              await enviarEmail(result.email, mailer)
+              console.log(`Email enviado para ${result.email}`)
+              writeStream.write(`\n${result.email}`)
+            }
+          } catch (e) {
+            console.log(`Falha ao enviar email: ${e}`)
           }
-        } catch (e) {
-          console.log(`Falha ao enviar email: ${e}`)
-        }
-        if (index === array.length -1) resolve();
+          if (index === array.length -1) resolve();
+        }, (index + 1) * 100)
       })
     })
     envios.then(() => {
@@ -52,8 +53,4 @@ async function enviarEmail(email, mailer) {
     subject: `${process.env.MAIL_SUBJECT}`,
     html: email_html
   })
-}
-
-function sleep(ms) {
-  return new Promise(resolve => setTimeout(resolve, ms));
 }
