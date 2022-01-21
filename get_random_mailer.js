@@ -7,6 +7,7 @@ module.exports = () => {
   const mailConf = {
     host: mails.hosts[indice],
     port: mails.ports[indice],
+    pool: true,
     auth: {
       user: mails.users[indice],
       pass: mails.passwords[indice]

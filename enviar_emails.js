@@ -10,20 +10,29 @@ let results = []
 let writeStream = fs.createWriteStream('emails_enviados.csv')
 writeStream.write('email')
 
+const mailer = getRandomMailer()
+
 fs.createReadStream('emails.csv')
   .pipe(csv({ separator: ',' }))
   .on('data', (data) => results.push(data))
   .on('end', async () => {   
-    results.forEach(async (result) => {
-      try {
-        if (result.enviado === 'N') {
-          await enviarEmail(result.email)
-          console.log(`Email enviado para ${result.email}`)
-          writeStream.write(`\n${result.email}`)
+    envios = new Promise((resolve, reject) => { 
+      results.forEach(async (result, index, array) => {
+        try {
+          if (result.enviado === 'N') {
+            await sleep(2000)
+            await enviarEmail(result.email, mailer)
+            console.log(`Email enviado para ${result.email}`)
+            writeStream.write(`\n${result.email}`)     
+          }
+        } catch (e) {
+          console.log(`Falha ao enviar email: ${e}`)
         }
-      } catch (e) {
-        console.log(`Falha ao enviar email: ${e}`)
-      }
+        if (index === array.length -1) resolve();
+      })
+    })
+    envios.then(() => {
+      mailer.close()
     })
   })
   .on('error', (e) => {
@@ -34,8 +43,7 @@ writeStream.on('finish', () => {
   console.log('Emails enviados anotados!');
 });
 
-async function enviarEmail(email) {
-  const mailer = getRandomMailer()
+async function enviarEmail(email, mailer) {
   const email_html = fs.readFileSync(__dirname + "/email_body.html", { encoding:'utf8' }).toString()
 
   return mailer.sendMail({
@@ -44,4 +52,8 @@ async function enviarEmail(email) {
     subject: `${process.env.MAIL_SUBJECT}`,
     html: email_html
   })
+}
+
+function sleep(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
 }
