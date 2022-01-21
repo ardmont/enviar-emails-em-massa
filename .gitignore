@@ -1,6 +1,9 @@
 node_modules
 .env.development
 .env.production
+log_*
 emails.csv
+emails_development.csv
+emails_production.csv
 emails_enviados.csv
 email_body.html
