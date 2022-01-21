@@ -29,7 +29,7 @@ fs.createReadStream('emails.csv')
             console.log(`Falha ao enviar email: ${e}`)
           }
           if (index === array.length -1) resolve();
-        }, (index + 1) * 100)
+        }, (index + 1) * 1500)
       })
     })
     envios.then(() => {
